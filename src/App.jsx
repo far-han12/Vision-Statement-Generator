@@ -161,8 +161,8 @@ const App = () => {
                         "What are your core values?",
                         "What is your mission in your industry?",
                         "What do you aspire to achieve in the long term?",
-                        "Who are your primary stakeholders?",
-                        "How should your stakeholders view your organization?",
+                        "What innovative approaches will you implement to stay ahead of the competition?",
+                        "How do you plan to adapt to future challenges in your industry?",
                         "What impact do you want to make in your community?",
                         "What sets you apart from your competitors?",
                         "What are your primary business goals?",
@@ -247,7 +247,7 @@ const App = () => {
     initial={{ opacity: 0, scale: 0.9 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.2, ease: "easeInOut" }}
-    whileHover={{ scale: 1.02 }}
+    whileHover={{ scale: 1.05 }}
 >
     {generatingAnswer ? (
         <Loader />

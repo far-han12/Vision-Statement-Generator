@@ -243,7 +243,7 @@ const App = () => {
                 </motion.form>
 
                 <motion.div
-    className="w-[330px] md:w-full lg:w-full mx-auto text-center rounded-lg my-4 text-xs md:text-sm lg:text-base shadow-lg border border-gray-400 transition-all duration-200 hover:border-blue-400 transform hover:scale-105 focus:shadow-lg"
+    className="w-[300px] md:w-full lg:w-full mx-auto text-center rounded-lg my-4 text-xs md:text-sm lg:text-base shadow-lg border border-gray-400 transition-all duration-200 hover:border-blue-400 transform hover:scale-105 focus:shadow-lg"
     initial={{ opacity: 0, scale: 0.9 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 0.2, ease: "easeInOut" }}

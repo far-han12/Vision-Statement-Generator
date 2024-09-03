@@ -1,12 +1,13 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';  // Import useForm hook
+import axios from 'axios';
 import ReactMarkdown from "react-markdown";
 import { motion } from 'framer-motion';
-import './button.css';
-import './h1.css';
 import { RiAiGenerate } from "react-icons/ri";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRobot } from '@fortawesome/free-solid-svg-icons';
+import './button.css';
+import './h1.css';
 
 const Loader = () => {
     return (
@@ -16,45 +17,38 @@ const Loader = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
         >
-            <FontAwesomeIcon icon={faRobot} beatFade style={{color: "#289ad5",fontSize: '100px',}}/>
+            <FontAwesomeIcon icon={faRobot} beatFade style={{ color: "#289ad5", fontSize: '100px', }} />
         </motion.div>
     );
 };
 
 const App = () => {
-    const [questions, setQuestions] = useState({
-        question1: "",
-        question2: "",
-        question3: "",
-        question4: "",
-        question5: "",
-        question6: "",
-        question7: "",
-        question8: "",
-        question9: "",
-        question10: ""
-    });
-
+    const { register, handleSubmit, formState: { errors } } = useForm();  // Initialize useForm and destructure needed methods
     const [answer, setAnswer] = useState("");
     const [generatingAnswer, setGeneratingAnswer] = useState(false);
     const [wordLimit, setWordLimit] = useState(100);
     const [lineLimit, setLineLimit] = useState(5);
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
-    const handleChange = (questionKey, value) => {
-        setQuestions(prevQuestions => ({
-            ...prevQuestions,
-            [questionKey]: value
-        }));
+    useEffect(() => {
+        localStorage.setItem('theme', theme);
+        document.querySelector('html').setAttribute('data-theme', theme);
+    }, [theme]);
+
+    const handleToggle = e => {
+        if (e.target.checked) {
+            setTheme('dark');
+        } else {
+            setTheme('light');
+        }
     };
 
-    const generateVisionStatement = async (e) => {
-        e.preventDefault();
+    const generateVisionStatement = async (data) => {
         setGeneratingAnswer(true);
-
-        setAnswer();
+        setAnswer("");
 
         try {
-            const combinedQuestions = Object.values(questions).join(" ");
+            const combinedQuestions = Object.values(data).join(" ");
             const response = await axios({
                 url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${
                     import.meta.env.VITE_API_GENERATIVE_LANGUAGE_CLIENT
@@ -64,16 +58,21 @@ const App = () => {
                     contents: [{
                         parts: [{
                             text: `The following are key insights and information provided by the user:
-                            \n${combinedQuestions}
-                            \nUsing this information, please generate a detailed vision statement for the user's organization. The vision statement should clearly articulate the user's aspirations, core values, and long-term goals, and should be crafted to inspire stakeholders, employees, and customers. The statement should also reflect how the user intends to differentiate their organization within their industry and make a meaningful impact in their community. 
-                            \nPlease ensure the vision statement is concise and powerful, adhering to the following constraints: it must be exact ${wordLimit} words and ${lineLimit} lines.`
+\n${combinedQuestions}
+\nUsing this information, please generate a detailed vision statement for the user's organization. The vision statement should clearly articulate the user's aspirations, core values, and long-term goals, and should be crafted to inspire stakeholders, employees, and customers. The statement should also reflect how the user intends to differentiate their organization within their industry and make a meaningful impact in their community.
+\nPlease adhere to the following constraints:
+1. The vision statement must be exactly ${wordLimit} words.
+2. The vision statement must be exactly ${lineLimit} lines.
+3. Prioritize the word limit by making each line longer and filled with more content, ensuring that the lines are balanced and dense with information.
+\nEnsure the vision statement is concise, powerful, and meets these exact specifications. If necessary, adjust the phrasing to maintain the balance between the word and line limits.`
+
                         }]
                     }],
                 },
             });
 
             setAnswer(response.data.candidates[0].content.parts[0].text);
-         
+
         } catch (error) {
             console.log(error);
             setAnswer("Sorry - Something went wrong. Please try again!");
@@ -82,28 +81,13 @@ const App = () => {
         setGeneratingAnswer(false);
     };
 
-    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
-
-    useEffect(() => {
-      localStorage.setItem('theme', theme);
-      document.querySelector('html').setAttribute('data-theme', theme);
-    }, [theme]);
-
-    const handleToggle = e => {
-      if (e.target.checked) {
-        setTheme('dark');
-      } else {
-        setTheme('light');
-      }
-    };
-
     return (
-        <div className='mt-8  mx-auto md:px-10 lg:px-14 font-roboto'>
+        <div className='mt-8 mx-auto md:px-10 lg:px-14 font-roboto'>
             <motion.label
                 className="flex cursor-pointer gap-2 mx-auto my-5 justify-center"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeInOut"  }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -135,14 +119,14 @@ const App = () => {
             </motion.label>
             <div>
                 <motion.form
-                    onSubmit={generateVisionStatement}
+                    onSubmit={handleSubmit(generateVisionStatement)}  
                     className="w-full mx-auto text-center rounded-lg py-6 px-4"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, ease: "easeInOut" }}
                 >
                     <motion.h1
-                        className="text-2xl md:text-3xl lg:text-4xl flex justify-center  mt-5 lg:mb-8 font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 mb-4 animate-gradient"
+                        className="text-2xl md:text-3xl lg:text-4xl flex justify-center mt-5 lg:mb-8 font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 mb-4 animate-gradient"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.5, ease: "easeInOut", delay: 0.3 }}
@@ -170,23 +154,26 @@ const App = () => {
                         "How do you plan to measure success?"
                     ].map((question, index) => (
                         <motion.div
-                            key={index}
-                            className="mb-4"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, ease: "easeInOut", delay: index * 0.1 }}
-                        >
-                            <label className="block text-left my-2 text-base md:text-lg lg:text-xl">{question}</label>
-                            <input
-                                required
-                                className="border-2 text-xs md:text-sm lg:text-base border-gray-300 rounded w-full p-2 transition-all duration-300 hover:border-blue-400 transform hover:scale-105 focus:shadow-lg"
-                                value={questions[`question${index + 1}`]}
-                                onChange={(e) => handleChange(`question${index + 1}`, e.target.value)}
-                                placeholder={question}
-                            ></input>
-                        </motion.div>
+                        key={index}
+                        className="mb-4"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, ease: "easeInOut", delay: index * 0.1 }}
+                    >
+                        <label className="block text-left my-2 text-base md:text-lg lg:text-xl">{question}</label>
+                        <input
+                            {...register(`question${index + 1}`, { required: "This field is required. Please provide your answer." })}  
+                            className={`border-2 text-xs md:text-sm lg:text-base rounded w-full p-2 transition-all duration-300 hover:border-blue-400 transform hover:scale-105 focus:shadow-lg ${
+                                errors[`question${index + 1}`] ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                            placeholder={question}
+                        />
+                        {errors[`question${index + 1}`] && (
+                            <span className="text-red-500 text-sm">{errors[`question${index + 1}`]?.message}</span>
+                        )}
+                    </motion.div>
                     ))}
-                    
+
                     <motion.div
                         className="my-4"
                         initial={{ opacity: 0, y: 20 }}
@@ -227,36 +214,35 @@ const App = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5, ease: "easeInOut", delay: 1.3 }}
                     >
-                   <button
-    type="submit"
-    className={`relative bg-gradient-to-r flex justify-center items-center gap-2 from-cyan-400 to-blue-500 text-white p-3 rounded-full my-4 mx-auto btn-wide ${generatingAnswer ? 'generating' : ''}`}
-    
-    disabled={generatingAnswer}
->
-    {generatingAnswer ? (
-        <>
-            Generating<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span>
-        </>
-    ) : (answer ? "Regenerate" : "Generate")} <RiAiGenerate />
-</button>
+                        <button
+                            type="submit"
+                            className={`relative bg-gradient-to-r  flex justify-center items-center gap-2 from-cyan-400 to-blue-500 text-white p-3 rounded-full my-4 mx-auto btn-wide ${generatingAnswer ? 'generating' : ''}`}
+                            disabled={generatingAnswer}
+                        >
+                            {generatingAnswer ? (
+                                <>
+                                    Generating<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span>
+                                </>
+                            ) : (answer ? "Regenerate" : "Generate")} <RiAiGenerate />
+                        </button>
                     </motion.div>
                 </motion.form>
 
                 <motion.div
-    className="w-[350px] md:w-full lg:w-full mx-auto text-center rounded-lg my-4 text-xs md:text-sm lg:text-base shadow-lg border border-gray-400 transition-all duration-200 hover:border-blue-400 transform hover:scale-105 focus:shadow-lg"
-    initial={{ opacity: 0, scale: 0.9 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.2, ease: "easeInOut" }}
-    whileHover={{ scale: 1.05 }}
->
-    {generatingAnswer ? (
-        <Loader />
-    ) : (
-        <ReactMarkdown className="p-4 md:p-6 lg:p-8 text-justify leading-5 lg:leading-7">
-            {answer}
-        </ReactMarkdown>
-    )}
-</motion.div>
+                    className="w-[350px] md:w-full lg:w-full mx-auto border-2 text-center rounded-lg my-4 text-xs md:text-sm lg:text-base shadow-lg  border-gray-400 transition-all duration-200 hover:border-blue-400 transform hover:scale-105 focus:shadow-lg"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    whileHover={{ scale: 1.02 }}
+                >
+                    {generatingAnswer ? (
+                        <Loader />
+                    ) : (
+                        <ReactMarkdown className="p-4 md:p-6 lg:p-8 text-justify leading-5 lg:leading-7">
+                            {answer}
+                        </ReactMarkdown>
+                    )}
+                </motion.div>
 
             </div>
         </div>

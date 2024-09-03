@@ -1,0 +1,43 @@
+.text-4xl {
+    font-size: 2.5rem; /* Adjust as needed */
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.bg-clip-text {
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+}
+
+.bg-gradient-to-r {
+    background-image: linear-gradient(90deg, rgb(23, 76, 221), rgba(2, 132, 199, 1), rgba(29, 78, 216, 1));
+}
+
+.animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-animation 3s ease infinite;
+}
+
+@keyframes gradient-animation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+
+@keyframes underline-animation {
+    0%, 100% {
+        width: 60%;
+    }
+    50% {
+        width: 80%;
+    }
+}

@@ -201,7 +201,7 @@ const App = () => {
                         <input
                             type="range"
                             min="1"
-                            max="20"
+                            max="30"
                             value={lineLimit}
                             onChange={(e) => setLineLimit(e.target.value)}
                             className="w-full"

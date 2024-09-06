@@ -23,7 +23,7 @@ const Loader = () => {
 };
 
 const App = () => {
-    const { register, handleSubmit, formState: { errors } } = useForm();  // Initialize useForm and destructure needed methods
+    const { register, handleSubmit, formState: { errors } } = useForm();  
     const [answer, setAnswer] = useState("");
     const [generatingAnswer, setGeneratingAnswer] = useState(false);
     const [wordLimit, setWordLimit] = useState(100);
@@ -49,6 +49,7 @@ const App = () => {
 
         try {
             const combinedQuestions = Object.values(data).join(" ");
+          
             const response = await axios({
                 url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${
                     import.meta.env.VITE_API_GENERATIVE_LANGUAGE_CLIENT
@@ -59,8 +60,9 @@ const App = () => {
                         parts: [{
                             text: `The following are key insights and information provided by the user:
 \n${combinedQuestions}
-\nUsing this information, please generate a detailed vision statement for the user's organization. The vision statement should clearly articulate the user's aspirations, core values, and long-term goals, and should be crafted to inspire stakeholders, employees, and customers. The statement should also reflect how the user intends to differentiate their organization within their industry and make a meaningful impact in their community.
-\nPlease adhere to the following constraints:
+\nUsing this information, please generate a detailed vision statement for the user's organization. The vision statement should clearly articulate the user's aspirations, core values, and long-term goals, and should be crafted to inspire employees, and customers. The statement should also reflect how the user intends to differentiate their organization within their industry and make a meaningful impact in their community.
+\nBefore generating the vision statement, check if the input provided by the user is coherent and meaningful. If the input contains irrelevant, incomplete, or nonsensical text (e.g., random words, placeholder text, or jargon), respond by asking the user to provide clearer, meaningful, and relevant information in order to generate an accurate vision statement.
+\nIf the input is valid and coherent, please adhere to the following constraints:
 1. The vision statement must be exactly ${wordLimit} words.
 2. The vision statement must be exactly ${lineLimit} lines.
 3. Prioritize the word limit by making each line longer and filled with more content, ensuring that the lines are balanced and dense with information.

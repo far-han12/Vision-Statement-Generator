@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';  // Import useForm hook
+import { useForm } from 'react-hook-form'; 
 import axios from 'axios';
 import ReactMarkdown from "react-markdown";
 import { motion } from 'framer-motion';
@@ -203,7 +203,7 @@ const App = () => {
                         <input
                             type="range"
                             min="1"
-                            max="30"
+                            max="50"
                             value={lineLimit}
                             onChange={(e) => setLineLimit(e.target.value)}
                             className="w-full"
